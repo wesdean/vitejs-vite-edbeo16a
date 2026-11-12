@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-app: #FAF9F5;
+    --text-primary: #292524; /* stone-800 */
+    --text-secondary: #78716c; /* stone-500 */
+    --border-card: rgba(231, 229, 228, 0.6); /* stone-200/60 */
+  }
+
+  body {
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
