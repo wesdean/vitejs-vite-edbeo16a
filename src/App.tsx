@@ -6,7 +6,8 @@ import EnergyCalibrationModal from './components/EnergyCalibrationModal';
 import LogView from './components/LogView';
 import { defaultPreferences, type EnergyLogEntry } from './config/appConfig';
 import type { UserPreferences } from './config/appConfig';
-import { Sliders } from 'lucide-react';
+import { mockTestEnergyLogs } from './config/testEnergyData';
+import { Sliders, Database } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<
@@ -17,8 +18,16 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCalibrationOpen, setIsCalibrationOpen] = useState(false);
 
-  // Safe lazy initialization of energyLogs with localStorage and fallback array
+  // Hard-coded test data toggle state backed by localStorage
+  const [useTestData, setUseTestData] = useState<boolean>(() => {
+    return localStorage.getItem('pace_purse_use_test_data') === 'true';
+  });
+
+  // Safe lazy initialization of energyLogs with test data support and localStorage fallback
   const [energyLogs, setEnergyLogs] = useState<EnergyLogEntry[]>(() => {
+    if (localStorage.getItem('pace_purse_use_test_data') === 'true') {
+      return mockTestEnergyLogs;
+    }
     try {
       const saved = localStorage.getItem('pace_purse_energy_logs');
       if (saved) {
@@ -46,9 +55,17 @@ export default function App() {
     localStorage.setItem('pace_purse_prefs', JSON.stringify(preferences));
   }, [preferences]);
 
+  // Sync test data toggle behavior
   useEffect(() => {
-    localStorage.setItem('pace_purse_energy_logs', JSON.stringify(energyLogs));
-  }, [energyLogs]);
+    localStorage.setItem('pace_purse_use_test_data', String(useTestData));
+    if (useTestData) {
+      setEnergyLogs(mockTestEnergyLogs);
+      localStorage.setItem('pace_purse_energy_logs', JSON.stringify(mockTestEnergyLogs));
+    } else {
+      setEnergyLogs([]);
+      localStorage.removeItem('pace_purse_energy_logs');
+    }
+  }, [useTestData]);
 
   // Handler when a new energy calibration/log is saved
   const handleSaveCalibration = (
@@ -83,8 +100,21 @@ export default function App() {
         preferences.highContrast ? 'contrast-125' : ''
       }`}
     >
-      {/* Settings Trigger */}
-      <div className="max-w-md w-full mx-auto px-4 pt-4 flex justify-end">
+      {/* Top Bar with Test Data Toggle & Settings Triggers */}
+      <div className="max-w-md w-full mx-auto px-4 pt-4 flex justify-between items-center">
+        <button
+          onClick={() => setUseTestData(!useTestData)}
+          className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 min-h-[48px] border-2 transition-colors cursor-pointer ${
+            useTestData
+              ? 'bg-amber-100 border-amber-400 text-amber-950'
+              : 'bg-white border-stone-300 text-stone-700 hover:bg-stone-50'
+          }`}
+          aria-label="Toggle Test Data"
+        >
+          <Database className="w-4 h-4" />
+          {useTestData ? 'Test Data: ON' : 'Test Data: OFF'}
+        </button>
+
         <button
           onClick={() => setIsSettingsOpen(true)}
           className="p-2.5 rounded-2xl bg-white border-2 border-stone-300 text-stone-800 hover:bg-stone-50 min-h-[48px] min-w-[48px] flex items-center justify-center shadow-xs transition-colors cursor-pointer"
