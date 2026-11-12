@@ -4,6 +4,7 @@ export interface UserPreferences {
   fontSize: 'normal' | 'large' | 'xlarge';
   moneyCurrencySymbol: string;
   energyUnitLabel: string;
+  maskPII: boolean;
 }
 
 export const defaultPreferences: UserPreferences = {
@@ -12,32 +13,23 @@ export const defaultPreferences: UserPreferences = {
   fontSize: 'normal',
   moneyCurrencySymbol: '$',
   energyUnitLabel: '%',
+  maskPII: true,
 };
 
-export interface EnergyLogEntry {
-  id: string;
-  timestamp: string;
-  level: number;
-  tierLabel: string;
-  tags: string[];
-  note: string;
-}
-
 export const appConfig = {
-  name: 'Pace & Purse',
-  tagline: 'Dual-Currency Balance',
-  version: '1.0.0',
+  name: "Pace & Purse",
+  tagline: "Dual-Currency Balance",
+  version: "1.0.0",
 
   accessibility: {
-    touchTarget: 'min-h-[48px] min-w-[48px] px-4 py-3',
-    focusRing:
-      'focus:outline-none focus:ring-4 focus:ring-amber-400 focus:ring-offset-2',
+    touchTarget: "min-h-[48px] min-w-[48px] px-4 py-3",
+    focusRing: "focus:outline-none focus:ring-4 focus:ring-amber-400 focus:ring-offset-2",
   },
 
   nav: {
-    dashboard: 'Today',
-    projects: 'Projects',
-    log: 'Log',
-    insights: 'Insights',
+    dashboard: "Today",
+    projects: "Projects",
+    log: "Log",
+    insights: "Insights",
   },
 };

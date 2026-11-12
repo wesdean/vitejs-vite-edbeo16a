@@ -1,172 +1,146 @@
 import React from 'react';
-import { DollarSign, Zap, Plus } from 'lucide-react';
+import { DollarSign, Zap, Plus, Sparkles } from 'lucide-react';
 import { appConfig } from '../config/appConfig';
-import type { UserPreferences } from '../config/appConfig';
 
 interface DashboardProps {
   moneyBalance: number;
   energyBattery: number;
-  preferences: UserPreferences;
-  onOpenCalibration: () => void; // Added callback prop
+  currencySymbol: string;
+  energyUnit: string;
+  onOpenCalibrate: () => void;
+  onNavigateLog: () => void;
 }
 
 export default function Dashboard({
   moneyBalance,
   energyBattery,
-  preferences,
-  onOpenCalibration,
+  currencySymbol,
+  energyUnit,
+  onOpenCalibrate,
+  onNavigateLog,
 }: DashboardProps) {
-  const titleSize =
-    preferences.fontSize === 'xlarge'
-      ? 'text-2xl'
-      : preferences.fontSize === 'large'
-      ? 'text-xl'
-      : 'text-lg';
-  const numberSize =
-    preferences.fontSize === 'xlarge'
-      ? 'text-3xl'
-      : preferences.fontSize === 'large'
-      ? 'text-2xl'
-      : 'text-xl';
-  const bodySize =
-    preferences.fontSize === 'xlarge'
-      ? 'text-base'
-      : preferences.fontSize === 'large'
-      ? 'text-sm'
-      : 'text-xs';
+  const clampedBattery = Math.max(0, Math.min(100, energyBattery));
+
+  const getAmbientInsight = () => {
+    if (clampedBattery >= 70) {
+      return `Energy is at ${clampedBattery}${energyUnit}. Great window for high-focus task planning before scheduling financial commitments.`;
+    }
+    if (clampedBattery >= 40) {
+      return `Energy is steady at ${clampedBattery}${energyUnit}. Pace heavier decisions and leave buffer time between tasks.`;
+    }
+    return `Energy is running low at ${clampedBattery}${energyUnit}. Prioritize rest and delay non-essential spending or complex choices.`;
+  };
 
   return (
-    <div className="space-y-5">
-      {/* Top Header with Calibrate Energy Button */}
-      <header className="flex justify-between items-center mb-2">
+    <div className="space-y-4">
+      {/* Header Row */}
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h1
-            className={`font-semibold ${titleSize} ${
-              appConfig.skin?.textPrimary || 'text-stone-950'
-            }`}
-          >
+          <h1 className="text-xl font-bold text-stone-950 tracking-tight">
             {appConfig.name}
           </h1>
-          <p
-            className={`${bodySize} ${
-              appConfig.skin?.textSecondary || 'text-stone-700'
-            }`}
-          >
+          <p className="text-xs font-medium text-stone-700">
             {appConfig.tagline}
           </p>
         </div>
+
         <button
-          onClick={onOpenCalibration}
-          className={`${bodySize} font-medium px-4 py-2.5 rounded-2xl bg-stone-200/80 text-stone-900 hover:bg-stone-200 transition-colors min-h-[48px] flex items-center justify-center shadow-xs cursor-pointer`}
+          type="button"
+          onClick={onOpenCalibrate}
+          className="px-4 py-3 rounded-2xl bg-stone-200/80 hover:bg-stone-300/80 text-stone-950 text-xs font-semibold min-h-[48px] min-w-[48px] transition-colors cursor-pointer focus:outline-none focus:ring-4 focus:ring-amber-400 focus:ring-offset-2"
         >
           Calibrate Energy
         </button>
-      </header>
+      </div>
 
-      {/* Dual Currency Cards Grid */}
+      {/* Dual-Currency Summary Cards */}
       <div className="grid grid-cols-2 gap-3">
-        {/* Money Currency Card */}
-        <div
-          className={`${
-            appConfig.skin?.cardBackground || 'bg-white'
-          } rounded-2xl p-4 ${
-            appConfig.skin?.cardBorder || 'border-2 border-stone-300'
-          } flex flex-col justify-between shadow-xs`}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <span
-              className={`${bodySize} font-medium ${
-                appConfig.skin?.textSecondary || 'text-stone-700'
-              }`}
-            >
+        {/* Financial Card */}
+        <div className="bg-white rounded-3xl p-4 border-2 border-stone-300/85 flex flex-col justify-between space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-stone-700">
               Financial
             </span>
-            <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-950">
-              <DollarSign className="w-4 h-4" />
-            </div>
-          </div>
-          <div>
-            <div
-              className={`font-bold ${numberSize} ${
-                appConfig.skin?.textPrimary || 'text-stone-950'
-              }`}
+            <span
+              aria-hidden="true"
+              className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-950 flex items-center justify-center"
             >
-              {preferences.moneyCurrencySymbol}
+              <DollarSign className="w-4 h-4" />
+            </span>
+          </div>
+
+          <div>
+            <div className="text-2xl font-bold text-stone-950 tracking-tight">
+              {currencySymbol}
               {moneyBalance.toLocaleString()}
             </div>
-            <div
-              className={`${bodySize} text-emerald-800 font-medium mt-1 flex items-center gap-0.5`}
-            >
-              <span>+320 {preferences.moneyCurrencySymbol} this week</span>
-            </div>
+            <p className="text-xs font-medium text-emerald-950 mt-1">
+              Available balance
+            </p>
           </div>
         </div>
 
-        {/* Energy Currency Card */}
-        <div
-          className={`${
-            appConfig.skin?.cardBackground || 'bg-white'
-          } rounded-2xl p-4 ${
-            appConfig.skin?.cardBorder || 'border-2 border-stone-300'
-          } flex flex-col justify-between shadow-xs`}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <span
-              className={`${bodySize} font-medium ${
-                appConfig.skin?.textSecondary || 'text-stone-700'
-              }`}
-            >
+        {/* Operational Energy Battery Card */}
+        <div className="bg-white rounded-3xl p-4 border-2 border-stone-300/85 flex flex-col justify-between space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-stone-700">
               Battery
             </span>
-            <div className="p-1.5 rounded-lg bg-amber-50 text-amber-950">
-              <Zap className="w-4 h-4" />
-            </div>
-          </div>
-          <div>
-            <div
-              className={`font-bold ${numberSize} ${
-                appConfig.skin?.textPrimary || 'text-stone-950'
-              }`}
+            <span
+              aria-hidden="true"
+              className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-300 text-amber-950 flex items-center justify-center"
             >
+              <Zap className="w-4 h-4" />
+            </span>
+          </div>
+
+          <div className="space-y-2">
+            <div className="text-2xl font-bold text-stone-950 tracking-tight">
               {energyBattery}
-              {preferences.energyUnitLabel}
+              {energyUnit}
             </div>
-            {/* Battery Level Progress Bar */}
-            <div className="w-full bg-stone-200 h-2 rounded-full mt-2.5 overflow-hidden">
+
+            <div
+              role="progressbar"
+              aria-label="Operational energy battery level"
+              aria-valuenow={clampedBattery}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              className="w-full h-2.5 rounded-full bg-stone-200 overflow-hidden"
+            >
               <div
-                className="bg-amber-600 h-full rounded-full transition-all duration-300"
-                style={{
-                  width: `${Math.min(100, Math.max(0, energyBattery))}%`,
-                }}
+                className="h-full rounded-full bg-amber-600 transition-all duration-300"
+                style={{ width: `${clampedBattery}%` }}
               />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Ambient Insight Banner */}
-      <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 shadow-xs">
-        <h3
-          className={`${bodySize} font-bold text-amber-950 uppercase tracking-wider mb-1`}
-        >
-          Ambient Insight
-        </h3>
-        <p className={`${bodySize} text-amber-900 leading-relaxed`}>
-          Energy is at {energyBattery}
-          {preferences.energyUnitLabel}. Great window for high-focus task
-          planning before scheduling financial commitments.
+      {/* Ambient Insight Card */}
+      <div
+        role="region"
+        aria-label="Ambient Insight"
+        className="rounded-3xl p-4 bg-amber-50/90 border-2 border-amber-300 text-amber-950 space-y-1.5"
+      >
+        <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider">
+          <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+          <span>Ambient Insight</span>
+        </div>
+        <p className="text-sm leading-relaxed text-stone-950">
+          {getAmbientInsight()}
         </p>
       </div>
 
-      {/* Quick Action Button */}
-      <div className="pt-2">
-        <button
-          className={`w-full bg-stone-950 hover:bg-stone-900 text-white font-medium py-3.5 rounded-xl ${bodySize} min-h-[48px] flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer`}
-        >
-          <Plus className="w-4 h-4" />
-          <span>Log Activity or Expense</span>
-        </button>
-      </div>
+      {/* Primary Action Button -> Triggers Energy Calibration Modal */}
+      <button
+        type="button"
+        onClick={onOpenCalibrate}
+        className="w-full bg-stone-950 hover:bg-stone-900 text-white font-semibold py-3.5 px-4 rounded-2xl min-h-[48px] flex items-center justify-center gap-2 transition-colors cursor-pointer focus:outline-none focus:ring-4 focus:ring-amber-400 focus:ring-offset-2"
+      >
+        <Plus className="w-5 h-5" aria-hidden="true" />
+        <span>Log Activity or Expense</span>
+      </button>
     </div>
   );
 }
